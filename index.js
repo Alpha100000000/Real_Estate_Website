@@ -210,3 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setMode('buy');
     updateFavCount();
 });
+
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+}
