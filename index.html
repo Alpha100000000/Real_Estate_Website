@@ -12,33 +12,63 @@
 
     <!-- Navbar -->
    <!-- Improved Navbar - Works on both desktop and mobile -->
+<!-- Fixed Mobile-Friendly Navbar -->
 <nav class="bg-zinc-900 border-b border-amber-900/30 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <i class="fa-solid fa-mountain-sun text-4xl text-amber-400"></i>
-            <span class="text-3xl font-bold tracking-tighter">VistaReal</span>
-        </div>
-
-        <!-- Desktop Navigation -->
-        <div class="hidden md:flex items-center gap-8">
-            <div class="bg-zinc-800 rounded-3xl p-1 flex">
-                <button onclick="setMode('buy')" id="buy-btn" class="px-8 py-3 rounded-3xl transition">BUY</button>
-                <button onclick="setMode('rent')" id="rent-btn" class="px-8 py-3 rounded-3xl transition">RENT</button>
+    <div class="max-w-7xl mx-auto px-6 py-5">
+        <div class="flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-mountain-sun text-4xl text-amber-400"></i>
+                <span class="text-3xl font-bold tracking-tighter">VistaReal</span>
             </div>
-            <a href="#" onclick="showFavorites()" class="hover:text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-heart"></i> Favorites <span id="nav-fav-count" class="text-amber-400">(0)</span>
-            </a>
-        </div>
 
-        <!-- Mobile Navigation -->
-        <div class="flex md:hidden items-center gap-4">
-            <button onclick="toggleMobileMenu()" class="text-3xl">
-                <i class="fa-solid fa-bars"></i>
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center gap-8">
+                <div class="bg-zinc-800 rounded-3xl p-1 flex">
+                    <button onclick="setMode('buy')" id="buy-btn" class="px-8 py-3 rounded-3xl transition">BUY</button>
+                    <button onclick="setMode('rent')" id="rent-btn" class="px-8 py-3 rounded-3xl transition">RENT</button>
+                </div>
+                <a href="#" onclick="showFavorites()" class="hover:text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-heart"></i> 
+                    Favorites <span id="nav-fav-count" class="text-amber-400">(0)</span>
+                </a>
+            </div>
+
+            <!-- Mobile Right Side -->
+            <div class="flex items-center gap-4 md:hidden">
+                <button onclick="toggleMobileMenu()" class="text-3xl p-2">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- List Property Button (visible on all screens) -->
+            <button onclick="alert('Listing form coming soon!')" 
+                    class="hidden md:block bg-amber-400 hover:bg-amber-500 text-zinc-950 font-semibold px-6 py-3 rounded-2xl text-sm">
+                LIST PROPERTY
             </button>
         </div>
-
-        <button onclick="alert('Listing form coming soon!')" class="bg-amber-400 hover:bg-amber-500 text-zinc-950 font-semibold px-6 py-3 rounded-2xl text-sm">LIST PROPERTY</button>
     </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-zinc-900 px-6 py-8 border-t border-zinc-800">
+        <div class="flex flex-col gap-6 text-lg">
+            <div class="bg-zinc-800 rounded-3xl p-1 flex">
+                <button onclick="setMode('buy'); toggleMobileMenu()" 
+                        class="flex-1 py-4 rounded-3xl transition">BUY</button>
+                <button onclick="setMode('rent'); toggleMobileMenu()" 
+                        class="flex-1 py-4 rounded-3xl transition">RENT</button>
+            </div>
+            <a href="#" onclick="showFavorites(); toggleMobileMenu()" 
+               class="hover:text-amber-400 flex items-center gap-3 py-3">
+                <i class="fa-solid fa-heart"></i> My Favorites
+            </a>
+            <button onclick="alert('Listing form coming soon!'); toggleMobileMenu()" 
+                    class="bg-amber-400 hover:bg-amber-500 text-zinc-950 font-semibold py-4 rounded-2xl">
+                LIST YOUR PROPERTY
+            </button>
+        </div>
+    </div>
+</nav>
 
     <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden md:hidden bg-zinc-900 px-6 py-6 border-t border-zinc-800">
