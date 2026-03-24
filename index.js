@@ -15,13 +15,7 @@ const allProperties = [
     { id: 4, title: "Taos Mountain Sanctuary", location: "Taos, NM", buyPrice: 689000, rentPrice: 2400, type: "House", beds: 3, baths: 2.5, sqft: 2280,
       images: ["https://picsum.photos/id/251/800/600"], desc: "Peaceful 5-acre mountain retreat." },
     { id: 5, title: "Corrales Horse Property", location: "Corrales, NM", buyPrice: 799000, rentPrice: 2800, type: "House", beds: 4, baths: 3, sqft: 3100,
-      images: ["https://picsum.photos/id/316/800/600"], desc: "Beautiful farmhouse on 2 acres." },
-    { id: 6, title: "North Valley Family Home", location: "Albuquerque, NM", buyPrice: 429900, rentPrice: 1950, type: "House", beds: 3, baths: 3, sqft: 2214,
-      images: ["https://picsum.photos/id/30/800/600"], desc: "Spacious family home with large backyard." },
-    { id: 7, title: "Downtown Rio Rancho", location: "Rio Rancho, NM", buyPrice: 389000, rentPrice: 1750, type: "House", beds: 4, baths: 3, sqft: 2450,
-      images: ["https://picsum.photos/id/411/800/600"], desc: "Perfect family home near excellent schools." },
-    { id: 8, title: "Las Cruces Spanish Villa", location: "Las Cruces, NM", buyPrice: 549000, rentPrice: 2200, type: "Villa", beds: 4, baths: 3.5, sqft: 2950,
-      images: ["https://picsum.photos/id/160/800/600"], desc: "Elegant Spanish-style villa near NMSU." }
+      images: ["https://picsum.photos/id/316/800/600"], desc: "Beautiful farmhouse on 2 acres." }
 ];
 
 let favorites = JSON.parse(localStorage.getItem('realEstateFavorites')) || [];
@@ -44,7 +38,7 @@ function setMode(mode) {
         slider.min = 800; slider.max = 6000; slider.step = 50; slider.value = 6000;
     }
     updatePriceLabel();
-    renderProperties(allProperties);
+    applyFilters();
 }
 
 function getPrice(p) {
@@ -133,7 +127,7 @@ function prevImage() {
     updateModalImage();
 }
 
-// ====================== FAVORITES (FULL PAGE) ======================
+// ====================== FAVORITES ======================
 function toggleFavorite(id) {
     event.stopImmediatePropagation();
     if (favorites.includes(id)) {
@@ -157,7 +151,7 @@ function showFavorites() {
     const favProps = allProperties.filter(p => favorites.includes(p.id));
 
     if (favProps.length === 0) {
-        grid.innerHTML = `<p class="col-span-3 text-center text-zinc-400 py-20 text-xl">You haven't saved any favorites yet ❤️<br><br>Browse homes and click the heart icon to add them.</p>`;
+        grid.innerHTML = `<p class="col-span-3 text-center text-zinc-400 py-20 text-xl">You haven't saved any favorites yet ❤️</p>`;
         document.getElementById('section-title').textContent = "My Favorite Homes";
         return;
     }
@@ -194,6 +188,12 @@ function removeFromFavorites(id) {
     showFavorites();
 }
 
+// ====================== MOBILE MENU ======================
+function toggleMobileMenu() {
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+}
+
 // ====================== MODAL HELPERS ======================
 function submitContactForm() {
     const name = document.getElementById('contact-name').value.trim();
@@ -220,14 +220,22 @@ function closeModal() {
     document.getElementById('property-modal').classList.add('hidden');
 }
 
+// ====================== FILTERS ======================
 function applyFilters() {
-    renderProperties(allProperties);
+    let filtered = allProperties.filter(p => getPrice(p) <= parseInt(document.getElementById('price-range').value));
+
+    const sort = document.getElementById('sort-by').value;
+    if (sort === 'price-low') filtered.sort((a,b) => getPrice(a) - getPrice(b));
+    if (sort === 'price-high') filtered.sort((a,b) => getPrice(b) - getPrice(a));
+    if (sort === 'beds') filtered.sort((a,b) => b.beds - a.beds);
+
+    renderProperties(filtered);
 }
 
 function resetAllFilters() {
     document.getElementById('price-range').value = currentMode === 'buy' ? 2000000 : 6000;
     updatePriceLabel();
-    renderProperties(allProperties);
+    applyFilters();
 }
 
 // ====================== INIT ======================
