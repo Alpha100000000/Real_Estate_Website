@@ -26,7 +26,7 @@ const allProperties = [
 
 let favorites = JSON.parse(localStorage.getItem('realEstateFavorites')) || [];
 
-// ====================== BUY / RENT TOGGLE ======================
+// ====================== BUY / RENT ======================
 function setMode(mode) {
     currentMode = mode;
     document.getElementById('buy-btn').classList.toggle('bg-amber-400', mode === 'buy');
@@ -39,18 +39,12 @@ function setMode(mode) {
 
     const slider = document.getElementById('price-range');
     if (mode === 'buy') {
-        slider.min = 200000;
-        slider.max = 2000000;
-        slider.step = 25000;
-        slider.value = 2000000;
+        slider.min = 200000; slider.max = 2000000; slider.step = 25000; slider.value = 2000000;
     } else {
-        slider.min = 800;
-        slider.max = 6000;
-        slider.step = 50;
-        slider.value = 6000;
+        slider.min = 800; slider.max = 6000; slider.step = 50; slider.value = 6000;
     }
     updatePriceLabel();
-    applyFilters();   // Important: refresh listings when switching mode
+    renderProperties(allProperties);
 }
 
 function getPrice(p) {
@@ -95,6 +89,7 @@ function renderProperties(props) {
     });
 }
 
+// ====================== MODAL ======================
 function openPropertyModal(prop) {
     currentProperty = prop;
     currentImageIndex = 0;
@@ -138,7 +133,7 @@ function prevImage() {
     updateModalImage();
 }
 
-// ====================== FAVORITES ======================
+// ====================== FAVORITES (FULL PAGE) ======================
 function toggleFavorite(id) {
     event.stopImmediatePropagation();
     if (favorites.includes(id)) {
@@ -156,10 +151,50 @@ function updateFavCount() {
 }
 
 function showFavorites() {
-    alert("❤️ Full Favorites page coming soon!");
+    const grid = document.getElementById('properties-grid');
+    grid.innerHTML = '';
+
+    const favProps = allProperties.filter(p => favorites.includes(p.id));
+
+    if (favProps.length === 0) {
+        grid.innerHTML = `<p class="col-span-3 text-center text-zinc-400 py-20 text-xl">You haven't saved any favorites yet ❤️<br><br>Browse homes and click the heart icon to add them.</p>`;
+        document.getElementById('section-title').textContent = "My Favorite Homes";
+        return;
+    }
+
+    favProps.forEach(p => {
+        const card = document.createElement('div');
+        card.className = "property-card bg-zinc-900 rounded-3xl overflow-hidden cursor-pointer relative";
+        card.innerHTML = `
+            <div class="relative">
+                <img src="${p.images[0]}" class="w-full h-64 object-cover">
+                <button onclick="event.stopImmediatePropagation(); removeFromFavorites(${p.id});" 
+                        class="absolute top-4 right-4 bg-black/70 hover:bg-red-600 text-white w-10 h-10 rounded-2xl flex items-center justify-center text-2xl">✕</button>
+            </div>
+            <div class="p-6">
+                <h3 class="font-semibold text-xl">${p.title}</h3>
+                <p class="text-amber-400">${p.location}</p>
+                <p class="text-3xl font-bold text-amber-400 mt-4">
+                    ${currentMode === 'buy' ? '$' + (p.buyPrice/1000).toFixed(0) + 'K' : '$' + p.rentPrice + '/mo'}
+                </p>
+            </div>
+        `;
+        card.onclick = () => openPropertyModal(p);
+        grid.appendChild(card);
+    });
+
+    document.getElementById('section-title').textContent = "My Favorite Homes";
 }
 
-// ====================== CONTACT FORM ======================
+function removeFromFavorites(id) {
+    event.stopImmediatePropagation();
+    favorites = favorites.filter(f => f !== id);
+    localStorage.setItem('realEstateFavorites', JSON.stringify(favorites));
+    updateFavCount();
+    showFavorites();
+}
+
+// ====================== MODAL HELPERS ======================
 function submitContactForm() {
     const name = document.getElementById('contact-name').value.trim();
     if (!name) {
@@ -185,24 +220,14 @@ function closeModal() {
     document.getElementById('property-modal').classList.add('hidden');
 }
 
-// ====================== FILTERS (This was the missing part) ======================
 function applyFilters() {
-    let filtered = allProperties.filter(p => {
-        return getPrice(p) <= parseInt(document.getElementById('price-range').value);
-    });
-
-    const sort = document.getElementById('sort-by').value;
-    if (sort === 'price-low') filtered.sort((a,b) => getPrice(a) - getPrice(b));
-    if (sort === 'price-high') filtered.sort((a,b) => getPrice(b) - getPrice(a));
-    if (sort === 'beds') filtered.sort((a,b) => b.beds - a.beds);
-
-    renderProperties(filtered);
+    renderProperties(allProperties);
 }
 
 function resetAllFilters() {
     document.getElementById('price-range').value = currentMode === 'buy' ? 2000000 : 6000;
     updatePriceLabel();
-    applyFilters();
+    renderProperties(allProperties);
 }
 
 // ====================== INIT ======================
@@ -210,8 +235,3 @@ document.addEventListener('DOMContentLoaded', () => {
     setMode('buy');
     updateFavCount();
 });
-
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobile-menu');
-    menu.classList.toggle('hidden');
-}
