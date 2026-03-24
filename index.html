@@ -5,86 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VistaReal Estates • New Mexico</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="bg-zinc-950 text-zinc-100">
 
     <!-- Navbar -->
-   <!-- Improved Navbar - Works on both desktop and mobile -->
-<!-- Fixed Mobile-Friendly Navbar -->
-<nav class="bg-zinc-900 border-b border-amber-900/30 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-5">
-        <div class="flex justify-between items-center">
-            <!-- Logo -->
+    <nav class="bg-zinc-900 border-b border-amber-900/30 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-mountain-sun text-4xl text-amber-400"></i>
                 <span class="text-3xl font-bold tracking-tighter">VistaReal</span>
             </div>
 
-            <!-- Desktop Navigation -->
-            <div class="hidden md:flex items-center gap-8">
+            <div class="flex items-center gap-8">
                 <div class="bg-zinc-800 rounded-3xl p-1 flex">
                     <button onclick="setMode('buy')" id="buy-btn" class="px-8 py-3 rounded-3xl transition">BUY</button>
                     <button onclick="setMode('rent')" id="rent-btn" class="px-8 py-3 rounded-3xl transition">RENT</button>
                 </div>
+                <button onclick="toggleView()" id="view-toggle" class="px-6 py-3 bg-zinc-800 rounded-3xl hover:bg-zinc-700 transition">MAP VIEW</button>
                 <a href="#" onclick="showFavorites()" class="hover:text-amber-400 flex items-center gap-2">
-                    <i class="fa-solid fa-heart"></i> 
-                    Favorites <span id="nav-fav-count" class="text-amber-400">(0)</span>
+                    <i class="fa-solid fa-heart"></i> Favorites <span id="nav-fav-count" class="text-amber-400">(0)</span>
                 </a>
             </div>
-
-            <!-- Mobile Right Side -->
-            <div class="flex items-center gap-4 md:hidden">
-                <button onclick="toggleMobileMenu()" class="text-3xl p-2">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-            </div>
-
-            <!-- List Property Button (visible on all screens) -->
-            <button onclick="alert('Listing form coming soon!')" 
-                    class="hidden md:block bg-amber-400 hover:bg-amber-500 text-zinc-950 font-semibold px-6 py-3 rounded-2xl text-sm">
-                LIST PROPERTY
-            </button>
         </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-zinc-900 px-6 py-8 border-t border-zinc-800">
-        <div class="flex flex-col gap-6 text-lg">
-            <div class="bg-zinc-800 rounded-3xl p-1 flex">
-                <button onclick="setMode('buy'); toggleMobileMenu()" 
-                        class="flex-1 py-4 rounded-3xl transition">BUY</button>
-                <button onclick="setMode('rent'); toggleMobileMenu()" 
-                        class="flex-1 py-4 rounded-3xl transition">RENT</button>
-            </div>
-            <a href="#" onclick="showFavorites(); toggleMobileMenu()" 
-               class="hover:text-amber-400 flex items-center gap-3 py-3">
-                <i class="fa-solid fa-heart"></i> My Favorites
-            </a>
-            <button onclick="alert('Listing form coming soon!'); toggleMobileMenu()" 
-                    class="bg-amber-400 hover:bg-amber-500 text-zinc-950 font-semibold py-4 rounded-2xl">
-                LIST YOUR PROPERTY
-            </button>
-        </div>
-    </div>
-</nav>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-zinc-900 px-6 py-6 border-t border-zinc-800">
-        <div class="flex flex-col gap-6 text-lg">
-            <div class="bg-zinc-800 rounded-3xl p-1 flex">
-                <button onclick="setMode('buy'); toggleMobileMenu()" id="mobile-buy-btn" 
-                        class="flex-1 py-4 rounded-3xl transition">BUY</button>
-                <button onclick="setMode('rent'); toggleMobileMenu()" id="mobile-rent-btn" 
-                        class="flex-1 py-4 rounded-3xl transition">RENT</button>
-            </div>
-            <a href="#" onclick="showFavorites(); toggleMobileMenu()" class="hover:text-amber-400 flex items-center gap-2">
-                <i class="fa-solid fa-heart"></i> My Favorites
-            </a>
-        </div>
-    </div>
-</nav>
+    </nav>
 
     <!-- Hero -->
     <header class="relative h-screen flex items-center bg-cover bg-center" style="background-image: url('https://picsum.photos/id/1015/2000/1200');">
@@ -125,18 +71,24 @@
         </div>
     </div>
 
-    <!-- Properties Grid -->
-    <section class="max-w-7xl mx-auto px-6 py-12">
+    <!-- Grid View -->
+    <div id="grid-view" class="max-w-7xl mx-auto px-6 py-12">
         <h2 id="section-title" class="text-4xl font-bold mb-8">Homes For Sale</h2>
         <div id="properties-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-    </section>
+    </div>
+
+    <!-- Map View -->
+    <div id="map-view" class="hidden max-w-7xl mx-auto px-6 py-12">
+        <h2 class="text-4xl font-bold mb-8">Homes on Map</h2>
+        <div id="map" class="h-[600px] rounded-3xl overflow-hidden"></div>
+    </div>
 
     <!-- Modal -->
     <div id="property-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4">
         <div class="bg-zinc-900 rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-hidden modal-content flex flex-col">
             <div class="relative">
                 <button onclick="closeModal()" class="absolute top-6 right-6 text-5xl text-white z-50 bg-black/60 hover:bg-black w-12 h-12 rounded-2xl flex items-center justify-center">×</button>
-                <img id="modal-main-image" class="w-full h-80 md:h-96 object-cover" alt="">
+                <img id="modal-main-image" onclick="openLightbox()" class="w-full h-80 md:h-96 object-cover cursor-zoom-in" alt="">
                 <button onclick="prevImage()" class="absolute left-6 top-1/2 -translate-y-1/2 bg-black/70 text-white w-12 h-12 rounded-2xl text-3xl">←</button>
                 <button onclick="nextImage()" class="absolute right-6 top-1/2 -translate-y-1/2 bg-black/70 text-white w-12 h-12 rounded-2xl text-3xl">→</button>
             </div>
@@ -171,6 +123,12 @@
                     <div id="mortgage-result" class="mt-6 text-center text-2xl font-bold text-amber-400 hidden"></div>
                 </div>
 
+                <!-- Similar Homes -->
+                <div>
+                    <h3 class="font-semibold mb-4">Similar Homes You Might Like</h3>
+                    <div id="similar-homes" class="grid grid-cols-2 gap-4"></div>
+                </div>
+
                 <!-- Contact Agent Form -->
                 <div class="bg-zinc-800 p-6 rounded-3xl">
                     <h3 class="font-semibold mb-4">Contact Agent</h3>
@@ -190,6 +148,13 @@
         </div>
     </div>
 
+    <!-- Lightbox -->
+    <div id="lightbox" class="hidden fixed inset-0 bg-black/95 z-[200] flex items-center justify-center">
+        <button onclick="closeLightbox()" class="absolute top-8 right-8 text-white text-5xl">×</button>
+        <img id="lightbox-image" class="max-h-[90vh] max-w-[90vw] object-contain" alt="">
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="index.js"></script>
 </body>
 </html>

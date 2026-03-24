@@ -15,12 +15,18 @@ const allProperties = [
     { id: 4, title: "Taos Mountain Sanctuary", location: "Taos, NM", buyPrice: 689000, rentPrice: 2400, type: "House", beds: 3, baths: 2.5, sqft: 2280,
       images: ["https://picsum.photos/id/251/800/600"], desc: "Peaceful 5-acre mountain retreat." },
     { id: 5, title: "Corrales Horse Property", location: "Corrales, NM", buyPrice: 799000, rentPrice: 2800, type: "House", beds: 4, baths: 3, sqft: 3100,
-      images: ["https://picsum.photos/id/316/800/600"], desc: "Beautiful farmhouse on 2 acres." }
+      images: ["https://picsum.photos/id/316/800/600"], desc: "Beautiful farmhouse on 2 acres." },
+    { id: 6, title: "North Valley Family Home", location: "Albuquerque, NM", buyPrice: 429900, rentPrice: 1950, type: "House", beds: 3, baths: 3, sqft: 2214,
+      images: ["https://picsum.photos/id/30/800/600"], desc: "Spacious family home with large backyard." },
+    { id: 7, title: "Downtown Rio Rancho", location: "Rio Rancho, NM", buyPrice: 389000, rentPrice: 1750, type: "House", beds: 4, baths: 3, sqft: 2450,
+      images: ["https://picsum.photos/id/411/800/600"], desc: "Perfect family home near excellent schools." },
+    { id: 8, title: "Las Cruces Spanish Villa", location: "Las Cruces, NM", buyPrice: 549000, rentPrice: 2200, type: "Villa", beds: 4, baths: 3.5, sqft: 2950,
+      images: ["https://picsum.photos/id/160/800/600"], desc: "Elegant Spanish-style villa near NMSU." }
 ];
 
 let favorites = JSON.parse(localStorage.getItem('realEstateFavorites')) || [];
 
-// ====================== BUY / RENT ======================
+// ====================== BUY / RENT TOGGLE ======================
 function setMode(mode) {
     currentMode = mode;
     document.getElementById('buy-btn').classList.toggle('bg-amber-400', mode === 'buy');
@@ -33,12 +39,18 @@ function setMode(mode) {
 
     const slider = document.getElementById('price-range');
     if (mode === 'buy') {
-        slider.min = 200000; slider.max = 2000000; slider.step = 25000; slider.value = 2000000;
+        slider.min = 200000;
+        slider.max = 2000000;
+        slider.step = 25000;
+        slider.value = 2000000;
     } else {
-        slider.min = 800; slider.max = 6000; slider.step = 50; slider.value = 6000;
+        slider.min = 800;
+        slider.max = 6000;
+        slider.step = 50;
+        slider.value = 6000;
     }
     updatePriceLabel();
-    renderProperties(allProperties);
+    applyFilters();   // Important: refresh listings when switching mode
 }
 
 function getPrice(p) {
@@ -53,7 +65,7 @@ function updatePriceLabel() {
         : '$' + val + '/mo';
 }
 
-// ====================== LISTINGS ======================
+// ====================== RENDER LISTINGS ======================
 function renderProperties(props) {
     const grid = document.getElementById('properties-grid');
     grid.innerHTML = '';
@@ -83,7 +95,6 @@ function renderProperties(props) {
     });
 }
 
-// ====================== MODAL ======================
 function openPropertyModal(prop) {
     currentProperty = prop;
     currentImageIndex = 0;
@@ -137,7 +148,7 @@ function toggleFavorite(id) {
     }
     localStorage.setItem('realEstateFavorites', JSON.stringify(favorites));
     updateFavCount();
-    renderProperties(allProperties); // refresh hearts
+    renderProperties(allProperties);
 }
 
 function updateFavCount() {
@@ -174,15 +185,24 @@ function closeModal() {
     document.getElementById('property-modal').classList.add('hidden');
 }
 
-// ====================== FILTERS ======================
+// ====================== FILTERS (This was the missing part) ======================
 function applyFilters() {
-    renderProperties(allProperties);
+    let filtered = allProperties.filter(p => {
+        return getPrice(p) <= parseInt(document.getElementById('price-range').value);
+    });
+
+    const sort = document.getElementById('sort-by').value;
+    if (sort === 'price-low') filtered.sort((a,b) => getPrice(a) - getPrice(b));
+    if (sort === 'price-high') filtered.sort((a,b) => getPrice(b) - getPrice(a));
+    if (sort === 'beds') filtered.sort((a,b) => b.beds - a.beds);
+
+    renderProperties(filtered);
 }
 
 function resetAllFilters() {
     document.getElementById('price-range').value = currentMode === 'buy' ? 2000000 : 6000;
     updatePriceLabel();
-    renderProperties(allProperties);
+    applyFilters();
 }
 
 // ====================== INIT ======================
@@ -190,8 +210,3 @@ document.addEventListener('DOMContentLoaded', () => {
     setMode('buy');
     updateFavCount();
 });
-
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobile-menu');
-    menu.classList.toggle('hidden');
-}
