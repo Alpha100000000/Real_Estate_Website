@@ -1,21 +1,23 @@
 let currentMode = 'buy';
+let currentView = 'grid'; // 'grid' or 'map'
 let currentProperty = null;
 let currentImageIndex = 0;
+let map = null;
 
 const allProperties = [
     { id: 1, title: "Sandia Foothills Modern", location: "Albuquerque, NM", buyPrice: 1249000, rentPrice: 4500, type: "Villa", beds: 5, baths: 4.5, sqft: 4850,
       images: ["https://picsum.photos/id/1015/800/600","https://picsum.photos/id/1016/800/600","https://picsum.photos/id/1018/800/600"],
-      desc: "Stunning modern villa with infinity pool and breathtaking Sandia Mountain views." },
+      desc: "Stunning modern villa with infinity pool and breathtaking Sandia Mountain views.", lat: 35.15, lng: -106.55 },
     { id: 2, title: "Old Town Historic Loft", location: "Albuquerque, NM", buyPrice: 449000, rentPrice: 1850, type: "Loft", beds: 2, baths: 2, sqft: 1420,
       images: ["https://picsum.photos/id/160/800/600","https://picsum.photos/id/201/800/600"],
-      desc: "Charming exposed brick loft in the heart of Old Town." },
+      desc: "Charming exposed brick loft in the heart of Old Town.", lat: 35.09, lng: -106.67 },
     { id: 3, title: "Santa Fe Adobe Estate", location: "Santa Fe, NM", buyPrice: 975000, rentPrice: 3200, type: "House", beds: 4, baths: 3, sqft: 3350,
       images: ["https://picsum.photos/id/201/800/600","https://picsum.photos/id/316/800/600"],
-      desc: "Classic Santa Fe adobe with kiva fireplace." },
+      desc: "Classic Santa Fe adobe with kiva fireplace.", lat: 35.68, lng: -105.94 },
     { id: 4, title: "Taos Mountain Sanctuary", location: "Taos, NM", buyPrice: 689000, rentPrice: 2400, type: "House", beds: 3, baths: 2.5, sqft: 2280,
-      images: ["https://picsum.photos/id/251/800/600"], desc: "Peaceful 5-acre mountain retreat." },
+      images: ["https://picsum.photos/id/251/800/600"], desc: "Peaceful 5-acre mountain retreat.", lat: 36.41, lng: -105.57 },
     { id: 5, title: "Corrales Horse Property", location: "Corrales, NM", buyPrice: 799000, rentPrice: 2800, type: "House", beds: 4, baths: 3, sqft: 3100,
-      images: ["https://picsum.photos/id/316/800/600"], desc: "Beautiful farmhouse on 2 acres." }
+      images: ["https://picsum.photos/id/316/800/600"], desc: "Beautiful farmhouse on 2 acres.", lat: 35.23, lng: -106.62 }
 ];
 
 let favorites = JSON.parse(localStorage.getItem('realEstateFavorites')) || [];
@@ -83,7 +85,6 @@ function renderProperties(props) {
     });
 }
 
-// ====================== MODAL ======================
 function openPropertyModal(prop) {
     currentProperty = prop;
     currentImageIndex = 0;
@@ -188,12 +189,6 @@ function removeFromFavorites(id) {
     showFavorites();
 }
 
-// ====================== MOBILE MENU ======================
-function toggleMobileMenu() {
-    const menu = document.getElementById('mobile-menu');
-    menu.classList.toggle('hidden');
-}
-
 // ====================== MODAL HELPERS ======================
 function submitContactForm() {
     const name = document.getElementById('contact-name').value.trim();
@@ -220,7 +215,6 @@ function closeModal() {
     document.getElementById('property-modal').classList.add('hidden');
 }
 
-// ====================== FILTERS ======================
 function applyFilters() {
     let filtered = allProperties.filter(p => getPrice(p) <= parseInt(document.getElementById('price-range').value));
 
@@ -236,6 +230,39 @@ function resetAllFilters() {
     document.getElementById('price-range').value = currentMode === 'buy' ? 2000000 : 6000;
     updatePriceLabel();
     applyFilters();
+}
+
+// ====================== MAP ======================
+function initMap() {
+    if (map) return;
+
+    map = L.map('map').setView([35.5, -106.0], 8);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap &copy; CARTO',
+        maxZoom: 19
+    }).addTo(map);
+
+    allProperties.forEach(p => {
+        const marker = L.marker([p.lat, p.lng]).addTo(map);
+        marker.bindPopup(`<b>${p.title}</b><br>${p.location}`);
+        marker.on('click', () => openPropertyModal(p));
+    });
+}
+
+function toggleView() {
+    if (currentView === 'grid') {
+        document.getElementById('grid-view').classList.add('hidden');
+        document.getElementById('map-view').classList.remove('hidden');
+        document.getElementById('view-toggle').textContent = 'GRID VIEW';
+        currentView = 'map';
+        if (!map) initMap();
+    } else {
+        document.getElementById('map-view').classList.add('hidden');
+        document.getElementById('grid-view').classList.remove('hidden');
+        document.getElementById('view-toggle').textContent = 'MAP VIEW';
+        currentView = 'grid';
+    }
 }
 
 // ====================== INIT ======================
