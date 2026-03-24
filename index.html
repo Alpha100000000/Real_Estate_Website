@@ -11,25 +11,50 @@
 <body class="bg-zinc-950 text-zinc-100">
 
     <!-- Navbar -->
-    <nav class="bg-zinc-900 border-b border-amber-900/30 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-mountain-sun text-4xl text-amber-400"></i>
-                <span class="text-3xl font-bold tracking-tighter">VistaReal</span>
-            </div>
-
-            <div class="hidden md:flex items-center gap-8">
-                <div class="bg-zinc-800 rounded-3xl p-1 flex">
-                    <button onclick="setMode('buy')" id="buy-btn" class="px-8 py-3 rounded-3xl transition">BUY</button>
-                    <button onclick="setMode('rent')" id="rent-btn" class="px-8 py-3 rounded-3xl transition">RENT</button>
-                </div>
-                <a href="#" onclick="showFavorites()" class="hover:text-amber-400 flex items-center gap-2">
-                    <i class="fa-solid fa-heart"></i> Favorites <span id="nav-fav-count" class="text-amber-400">(0)</span>
-                </a>
-            </div>
-            <button onclick="alert('Listing form coming soon!')" class="bg-amber-400 hover:bg-amber-500 text-zinc-950 font-semibold px-6 py-3 rounded-2xl text-sm">LIST PROPERTY</button>
+   <!-- Improved Navbar - Works on both desktop and mobile -->
+<nav class="bg-zinc-900 border-b border-amber-900/30 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <i class="fa-solid fa-mountain-sun text-4xl text-amber-400"></i>
+            <span class="text-3xl font-bold tracking-tighter">VistaReal</span>
         </div>
-    </nav>
+
+        <!-- Desktop Navigation -->
+        <div class="hidden md:flex items-center gap-8">
+            <div class="bg-zinc-800 rounded-3xl p-1 flex">
+                <button onclick="setMode('buy')" id="buy-btn" class="px-8 py-3 rounded-3xl transition">BUY</button>
+                <button onclick="setMode('rent')" id="rent-btn" class="px-8 py-3 rounded-3xl transition">RENT</button>
+            </div>
+            <a href="#" onclick="showFavorites()" class="hover:text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-heart"></i> Favorites <span id="nav-fav-count" class="text-amber-400">(0)</span>
+            </a>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div class="flex md:hidden items-center gap-4">
+            <button onclick="toggleMobileMenu()" class="text-3xl">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <button onclick="alert('Listing form coming soon!')" class="bg-amber-400 hover:bg-amber-500 text-zinc-950 font-semibold px-6 py-3 rounded-2xl text-sm">LIST PROPERTY</button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-zinc-900 px-6 py-6 border-t border-zinc-800">
+        <div class="flex flex-col gap-6 text-lg">
+            <div class="bg-zinc-800 rounded-3xl p-1 flex">
+                <button onclick="setMode('buy'); toggleMobileMenu()" id="mobile-buy-btn" 
+                        class="flex-1 py-4 rounded-3xl transition">BUY</button>
+                <button onclick="setMode('rent'); toggleMobileMenu()" id="mobile-rent-btn" 
+                        class="flex-1 py-4 rounded-3xl transition">RENT</button>
+            </div>
+            <a href="#" onclick="showFavorites(); toggleMobileMenu()" class="hover:text-amber-400 flex items-center gap-2">
+                <i class="fa-solid fa-heart"></i> My Favorites
+            </a>
+        </div>
+    </div>
+</nav>
 
     <!-- Hero -->
     <header class="relative h-screen flex items-center bg-cover bg-center" style="background-image: url('https://picsum.photos/id/1015/2000/1200');">
